@@ -101,12 +101,6 @@ function MapView() {
     setGeocoder(geocoderInstance);
     setDrawingManager(drawingManagerInstance);
     setMap(map);
-
-    addNotification({
-      type: 'success',
-      title: 'Map Loaded',
-      message: 'Google Maps initialized successfully'
-    });
   }, []);
 
   // Handle drawing mode changes

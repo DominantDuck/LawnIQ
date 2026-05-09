@@ -74,11 +74,6 @@ function App() {
               setGoogleMapsLoaded(true);
               setAPIKeysConfigured(true);
               clearInterval(checkInterval);
-              addNotification({
-                type: 'success',
-                title: 'Maps Loaded',
-                message: 'Google Maps API loaded successfully'
-              });
             }
           }, 100);
 
@@ -104,11 +99,6 @@ function App() {
           setGoogleMapsLoaded(true);
           setAPIKeysConfigured(true);
           setMapsLoadError(null);
-          addNotification({
-            type: 'success',
-            title: 'Maps Loaded',
-            message: 'Google Maps API loaded successfully'
-          });
         };
 
         script.onerror = () => {
