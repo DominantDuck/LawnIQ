@@ -1,0 +1,303 @@
+/* SwiftQuote. application styles */
+
+/* CSS Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* CSS Variables */
+:root {
+  --green-50: #EAF3DE;
+  --green-100: #C0DD97;
+  --green-200: #97C459;
+  --green-500: #4A8A18;
+  --green-700: #2D5A0A;
+  --green-900: #173404;
+  --ink: #1A1F14;
+  --ink-muted: #5A6352;
+  --ink-faint: #9AA68E;
+  --surface: #F7F9F4;
+  --surface-raised: #FFFFFF;
+  --border: rgba(60, 80, 40, 0.12);
+  --border-strong: rgba(60, 80, 40, 0.22);
+  --accent: #5AA620;
+  --error: #E53E3E;
+  --warning: #F56500;
+  --success: #38A169;
+  --info: #3182CE;
+}
+
+/* Base Styles */
+html, body {
+  height: 100%;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: 'DM Mono', 'SF Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+}
+
+/* App Layout */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 100vw;
+  background: var(--surface);
+}
+
+.app-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Map Container */
+.map-container {
+  flex: 1;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.map-container.expanded {
+  margin-left: 0;
+}
+
+/* Map Loading States */
+.map-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--surface);
+}
+
+.loading-state, .error-state {
+  text-align: center;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-state h3, .loading-state h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  color: var(--green-700);
+  margin-bottom: 0.5rem;
+}
+
+.error-state p, .loading-state p {
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+}
+
+.retry-button {
+  background: var(--green-700);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.retry-button:hover {
+  background: var(--green-500);
+}
+
+/* Button Styles */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.button.primary {
+  background: var(--green-700);
+  color: white;
+  border-color: var(--green-700);
+}
+
+.button.primary:hover {
+  background: var(--green-500);
+  border-color: var(--green-500);
+}
+
+.button.danger {
+  color: var(--error);
+  border-color: rgba(229, 62, 62, 0.25);
+}
+
+.button.danger:hover {
+  background: #FEF0F0;
+}
+
+.button.success {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.button.success:hover {
+  background: #2F855A;
+}
+
+/* Form Elements */
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.input::placeholder {
+  color: var(--ink-faint);
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+/* Card Component */
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 52, 4, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Area Display */
+.area-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  background: var(--green-50);
+  border: 1px solid var(--green-100);
+  border-radius: 20px;
+  padding: 0.25rem 0.875rem;
+}
+
+.area-display .number {
+  font-family: 'Fraunces', serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--green-700);
+  min-width: 64px;
+  text-align: right;
+}
+
+.area-display .unit {
+  font-size: 0.6875rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-main {
+    flex-direction: column;
+  }
+
+  .map-container {
+    order: 1;
+  }
+
+  .map-container.expanded {
+    margin-left: 0;
+  }
+
+  .app {
+    font-size: 13px;
+  }
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

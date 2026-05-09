@@ -1,0 +1,24 @@
+{
+  "name": "swiftquote-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/postgres": "^0.10.0",
+    "lucide-react": "^1.14.0",
+    "next": "^15.3.3",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "eslint": "^9.18.0",
+    "eslint-config-next": "^15.3.3"
+  }
+}

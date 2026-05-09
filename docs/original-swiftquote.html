@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SwiftQuote. — Property measurement</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-50: #EAF3DE;
+    --green-100: #C0DD97;
+    --green-200: #97C459;
+    --green-500: #4A8A18;
+    --green-700: #2D5A0A;
+    --green-900: #173404;
+    --ink: #1A1F14;
+    --ink-muted: #5A6352;
+    --ink-faint: #9AA68E;
+    --surface: #F7F9F4;
+    --surface-raised: #FFFFFF;
+    --border: rgba(60, 80, 40, 0.12);
+    --border-strong: rgba(60, 80, 40, 0.22);
+    --accent: #5AA620;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  #shell {
+    display: grid;
+    grid-template-rows: 56px 1fr 68px;
+    height: 100vh;
+    max-width: 100vw;
+  }
+
+  /* ── HEADER ── */
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    z-index: 20;
+  }
+
+  #wordmark {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  #wordmark span.brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+    color: var(--green-700);
+  }
+
+  #wordmark span.tag {
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  #search-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 520px;
+  }
+
+  #address-input {
+    flex: 1;
+    height: 36px;
+    padding: 0 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #address-input::placeholder { color: var(--ink-faint); }
+  #address-input:focus { border-color: var(--accent); }
+
+  #search-btn {
+    height: 36px;
+    padding: 0 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    background: var(--green-700);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  #search-btn:hover { background: var(--green-500); }
+
+  #header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  #area-pill {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    background: var(--green-50);
+    border: 1px solid var(--green-100);
+    border-radius: 20px;
+    padding: 4px 14px;
+  }
+  #area-pill .num {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--green-700);
+    min-width: 64px;
+    text-align: right;
+  }
+  #area-pill .unit {
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── MAP ── */
+  #map-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  #map { width: 100%; height: 100%; }
+
+  #hint-bar {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(23, 52, 4, 0.82);
+    color: rgba(255,255,255,0.9);
+    font-size: 12px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    pointer-events: none;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+
+  /* ── API KEY OVERLAY ── */
+  #key-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 52, 4, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    backdrop-filter: blur(2px);
+  }
+  #key-card {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 32px 36px;
+    width: 380px;
+    text-align: center;
+  }
+  #key-card .leaf {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  #key-card h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: var(--green-700);
+    margin-bottom: 6px;
+  }
+  #key-card p {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  #key-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  #key-input:focus { border-color: var(--accent); }
+  #key-load-btn {
+    width: 100%;
+    height: 38px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--green-700);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #key-load-btn:hover { background: var(--green-500); }
+  #key-error {
+    font-size: 11px;
+    color: #B03030;
+    margin-top: 8px;
+    min-height: 16px;
+  }
+
+  /* ── BOTTOM BAR ── */
+  #bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: var(--surface-raised);
+    border-top: 1px solid var(--border);
+    gap: 12px;
+    z-index: 20;
+  }
+
+  #draw-controls { display: flex; gap: 8px; align-items: center; }
+
+  .action-btn {
+    height: 34px;
+    padding: 0 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .action-btn:hover { background: var(--surface); }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .action-btn.draw-active {
+    background: var(--green-50);
+    border-color: var(--green-500);
+    color: var(--green-700);
+  }
+
+  .action-btn.danger {
+    color: #8B2020;
+    border-color: rgba(139,32,32,0.25);
+  }
+  .action-btn.danger:hover { background: #FEF0F0; }
+
+  #poly-count {
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  #export-btn {
+    height: 34px;
+    padding: 0 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    background: var(--green-700);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #export-btn:hover { background: var(--green-500); }
+  #export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── PRINT / EXPORT PANEL ── */
+  #export-panel {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 28px 32px;
+    width: 340px;
+    z-index: 40;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+  }
+  #export-panel h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--green-700);
+    margin-bottom: 16px;
+  }
+  .export-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .export-row:last-of-type { border-bottom: none; }
+  .export-row .lbl { color: var(--ink-muted); }
+  .export-row .val { font-weight: 500; color: var(--ink); }
+  #export-close {
+    margin-top: 16px;
+    width: 100%;
+    height: 34px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  #export-close:hover { background: var(--green-50); }
+  #export-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.2);
+    z-index: 39;
+    backdrop-filter: blur(1px);
+  }
+</style>
+</head>
+<body>
+
+<div id="shell">
+
+  <header id="header">
+    <div id="wordmark">
+      <span class="brand">SwiftQuote.</span>
+      <span class="tag">measurement</span>
+    </div>
+    <div id="search-row">
+      <input id="address-input" type="text" placeholder="Enter property address..." autocomplete="off" />
+      <button id="search-btn">Search</button>
+    </div>
+    <div id="header-right">
+      <div id="area-pill">
+        <span class="num" id="area-num">—</span>
+        <span class="unit">sq ft</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="map-wrap">
+    <div id="map"></div>
+    <div id="hint-bar">Search an address, then outline areas on the satellite view</div>
+
+    <div id="key-overlay">
+      <div id="key-card">
+        <span class="leaf">🌿</span>
+        <h2>Connect Google Maps</h2>
+        <p>Enter your API key. Needs Maps JavaScript API and Geocoding API enabled in Google Cloud Console.</p>
+        <input id="key-input" type="text" placeholder="AIza..." autocomplete="off" />
+        <button id="key-load-btn">Load Map →</button>
+        <div id="key-error"></div>
+      </div>
+    </div>
+
+    <div id="export-overlay"></div>
+    <div id="export-panel">
+      <h3>Quote Summary</h3>
+      <div class="export-row"><span class="lbl">Address</span><span class="val" id="ep-address">—</span></div>
+      <div class="export-row"><span class="lbl">Areas drawn</span><span class="val" id="ep-count">—</span></div>
+      <div class="export-row"><span class="lbl">Total measured area</span><span class="val" id="ep-sqft">—</span></div>
+      <div class="export-row"><span class="lbl">Generated</span><span class="val" id="ep-date">—</span></div>
+      <button id="export-close">Close</button>
+    </div>
+  </div>
+
+  <footer id="bottom-bar">
+    <div id="draw-controls">
+      <button class="action-btn" id="draw-btn" disabled>+ Draw area</button>
+      <button class="action-btn draw-active" id="stop-btn" style="display:none;" disabled>✓ Done drawing</button>
+      <button class="action-btn danger" id="undo-btn" disabled>Undo last</button>
+      <button class="action-btn danger" id="clear-btn" disabled>Clear all</button>
+      <span id="poly-count"></span>
+    </div>
+    <button id="export-btn" disabled>Export quote</button>
+  </footer>
+
+</div>
+
+<script>
+  let map, drawingManager, geocoder;
+  let polygons = [];
+  let currentAddress = '';
+  let mapLoaded = false;
+
+  function sqft(polygon) {
+    if (!window.google) return 0;
+    return google.maps.geometry.spherical.computeArea(polygon.getPath()) * 10.7639;
+  }
+
+  function totalSqft() {
+    return polygons.reduce((s, p) => s + sqft(p), 0);
+  }
+
+  function updateUI() {
+    const total = totalSqft();
+    const n = polygons.length;
+    document.getElementById('area-num').textContent = total > 0 ? Math.round(total).toLocaleString() : '—';
+    document.getElementById('poly-count').textContent = n > 0 ? n + (n === 1 ? ' area' : ' areas') : '';
+    document.getElementById('undo-btn').disabled = n === 0;
+    document.getElementById('clear-btn').disabled = n === 0;
+    document.getElementById('export-btn').disabled = n === 0;
+  }
+
+  function setDrawing(on) {
+    const db = document.getElementById('draw-btn');
+    const sb = document.getElementById('stop-btn');
+    if (on) {
+      db.style.display = 'none';
+      sb.style.display = 'inline-block';
+      sb.disabled = false;
+      document.getElementById('hint-bar').textContent = 'Click to place points — click the first point again to close the polygon';
+      drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+    } else {
+      sb.style.display = 'none';
+      db.style.display = 'inline-block';
+      db.disabled = false;
+      document.getElementById('hint-bar').textContent = 'Click "+ Draw area" to trace another area';
+      drawingManager.setDrawingMode(null);
+    }
+  }
+
+  function initMap(apiKey) {
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=drawing,geometry&callback=_mapReady`;
+    s.onerror = () => {
+      document.getElementById('key-error').textContent = 'Failed to load. Check key and enabled APIs.';
+    };
+    window._mapReady = function () {
+      mapLoaded = true;
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 33.749, lng: -84.388 },
+        zoom: 19,
+        mapTypeId: 'satellite',
+        tilt: 0,
+        mapTypeControl: false,
+        fullscreenControl: false,
+        streetViewControl: false,
+        zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER }
+      });
+
+      geocoder = new google.maps.Geocoder();
+
+      drawingManager = new google.maps.drawing.DrawingManager({
+        drawingMode: null,
+        drawingControl: false,
+        polygonOptions: {
+          fillColor: '#5AA620',
+          fillOpacity: 0.3,
+          strokeColor: '#2D5A0A',
+          strokeWeight: 2,
+          clickable: true,
+          editable: true,
+          zIndex: 1
+        }
+      });
+      drawingManager.setMap(map);
+
+      google.maps.event.addListener(drawingManager, 'polygoncomplete', function (poly) {
+        polygons.push(poly);
+        drawingManager.setDrawingMode(null);
+        setDrawing(false);
+        updateUI();
+        ['set_at', 'insert_at', 'remove_at'].forEach(ev =>
+          google.maps.event.addListener(poly.getPath(), ev, updateUI)
+        );
+      });
+
+      document.getElementById('key-overlay').style.display = 'none';
+      document.getElementById('draw-btn').disabled = false;
+      document.getElementById('hint-bar').textContent = 'Search a property address above to get started';
+    };
+    document.head.appendChild(s);
+  }
+
+  // Key load
+  document.getElementById('key-load-btn').addEventListener('click', () => {
+    const k = document.getElementById('key-input').value.trim();
+    if (!k || !k.startsWith('AIza')) {
+      document.getElementById('key-error').textContent = 'Key must start with AIza...';
+      return;
+    }
+    document.getElementById('key-error').textContent = '';
+    document.getElementById('key-load-btn').textContent = 'Loading...';
+    initMap(k);
+  });
+  document.getElementById('key-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('key-load-btn').click();
+  });
+
+  // Search
+  function doSearch() {
+    if (!geocoder) return;
+    const addr = document.getElementById('address-input').value.trim();
+    if (!addr) return;
+    currentAddress = addr;
+    geocoder.geocode({ address: addr }, (results, status) => {
+      if (status === 'OK') {
+        map.setCenter(results[0].geometry.location);
+        map.setZoom(20);
+        document.getElementById('hint-bar').textContent = 'Click "+ Draw area" to trace areas on this property';
+      } else {
+        document.getElementById('hint-bar').textContent = 'Address not found — try a more specific address';
+      }
+    });
+  }
+  document.getElementById('search-btn').addEventListener('click', doSearch);
+  document.getElementById('address-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  // Draw
+  document.getElementById('draw-btn').addEventListener('click', () => { if (mapLoaded) setDrawing(true); });
+  document.getElementById('stop-btn').addEventListener('click', () => setDrawing(false));
+
+  // Undo
+  document.getElementById('undo-btn').addEventListener('click', () => {
+    const last = polygons.pop();
+    if (last) last.setMap(null);
+    updateUI();
+    if (polygons.length === 0) document.getElementById('hint-bar').textContent = 'Click "+ Draw area" to trace areas on this property';
+  });
+
+  // Clear
+  document.getElementById('clear-btn').addEventListener('click', () => {
+    polygons.forEach(p => p.setMap(null));
+    polygons = [];
+    setDrawing(false);
+    updateUI();
+    document.getElementById('hint-bar').textContent = 'Click "+ Draw area" to trace areas on this property';
+  });
+
+  // Export
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const total = Math.round(totalSqft());
+    document.getElementById('ep-address').textContent = currentAddress || 'Unknown';
+    document.getElementById('ep-count').textContent = polygons.length;
+    document.getElementById('ep-sqft').textContent = total.toLocaleString() + ' sq ft';
+    document.getElementById('ep-date').textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+    document.getElementById('export-panel').style.display = 'block';
+    document.getElementById('export-overlay').style.display = 'block';
+  });
+  document.getElementById('export-close').addEventListener('click', () => {
+    document.getElementById('export-panel').style.display = 'none';
+    document.getElementById('export-overlay').style.display = 'none';
+  });
+  document.getElementById('export-overlay').addEventListener('click', () => {
+    document.getElementById('export-panel').style.display = 'none';
+    document.getElementById('export-overlay').style.display = 'none';
+  });
+</script>
+</body>
+</html>
