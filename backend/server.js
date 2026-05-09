@@ -262,8 +262,10 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+const router = express.Router();
+
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+router.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     message: 'SwiftQuote. API is running',
@@ -273,7 +275,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Debug endpoint
-app.get('/api/debug-env', (req, res) => {
+router.get('/api/debug-env', (req, res) => {
   res.json({
     googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ? 'Set (' + process.env.GOOGLE_MAPS_API_KEY.length + ' chars)' : 'Not set',
     nodeEnv: process.env.NODE_ENV,
@@ -282,12 +284,12 @@ app.get('/api/debug-env', (req, res) => {
 });
 
 // API Routes will be added here
-app.get('/api/test', (req, res) => {
+router.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });
 });
 
 // Debug image capture endpoint
-app.get('/api/test-image', async (req, res) => {
+router.get('/api/test-image', async (req, res) => {
   try {
     console.log('Testing image capture from server...');
     const result = await imageCaptureService.captureImage({
@@ -312,7 +314,7 @@ app.get('/api/test-image', async (req, res) => {
 });
 
 // Color-based grass analysis endpoint
-app.post('/api/analyze-color', async (req, res) => {
+router.post('/api/analyze-color', async (req, res) => {
   try {
     const { lat, lng, propertyType, colorOptions } = req.body;
 
@@ -460,7 +462,7 @@ app.post('/api/analyze-color', async (req, res) => {
 });
 
 // Direct color analysis endpoint (for when user already has an image)
-app.post('/api/analyze-image-color', async (req, res) => {
+router.post('/api/analyze-image-color', async (req, res) => {
   try {
     const { imageBase64, mapContext, colorOptions } = req.body;
 
@@ -564,7 +566,7 @@ app.post('/api/analyze-image-color', async (req, res) => {
 });
 
 // Polygon utility endpoints
-app.post('/api/calculate-area', (req, res) => {
+router.post('/api/calculate-area', (req, res) => {
   try {
     const { coordinates } = req.body;
 
@@ -593,7 +595,7 @@ app.post('/api/calculate-area', (req, res) => {
   }
 });
 
-app.post('/api/process-polygon', (req, res) => {
+router.post('/api/process-polygon', (req, res) => {
   try {
     const { polygon, options = {} } = req.body;
 
@@ -620,7 +622,7 @@ app.post('/api/process-polygon', (req, res) => {
   }
 });
 
-app.post('/api/polygons-to-geojson', (req, res) => {
+router.post('/api/polygons-to-geojson', (req, res) => {
   try {
     const { polygons } = req.body;
 
@@ -647,7 +649,7 @@ app.post('/api/polygons-to-geojson', (req, res) => {
 });
 
 // API service status endpoint
-app.get('/api/status', (req, res) => {
+router.get('/api/status', (req, res) => {
   const imageCaptureStatus = {
     available: true,
     googleMapsConfigured: imageCaptureService.googleMapsApiKey &&
@@ -691,7 +693,7 @@ app.get('/api/status', (req, res) => {
 });
 
 // Frontend configuration endpoint
-app.get('/api/config', (req, res) => {
+router.get('/api/config', (req, res) => {
   res.json({
     success: true,
     config: {
@@ -703,7 +705,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // Image capture endpoint
-app.post('/api/capture-image', async (req, res) => {
+router.post('/api/capture-image', async (req, res) => {
   try {
     const { lat, lng, zoom, size, propertyType } = req.body;
 
@@ -748,7 +750,7 @@ app.post('/api/capture-image', async (req, res) => {
 });
 
 // Multi-zoom image capture endpoint
-app.post('/api/capture-multi-zoom', async (req, res) => {
+router.post('/api/capture-multi-zoom', async (req, res) => {
   try {
     const { lat, lng, propertyType } = req.body;
 
@@ -795,7 +797,7 @@ app.post('/api/capture-multi-zoom', async (req, res) => {
 });
 
 // Error handling middleware
-app.use((error, req, res, next) => {
+router.use((error, req, res, next) => {
   console.error('Server Error:', error);
   res.status(500).json({
     error: 'Internal Server Error',
@@ -804,18 +806,29 @@ app.use((error, req, res, next) => {
 });
 
 // 404 handler
-app.use((req, res) => {
+router.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
     message: `Route ${req.originalUrl} not found`
   });
 });
 
+// Vercel multi-service: requests arrive as /{routePrefix}/api/... — mount router under the same prefix.
+const servicePrefix = (process.env.EXPRESS_ROUTE_PREFIX || '').trim().replace(/\/$/, '');
+if (servicePrefix) {
+  app.use(servicePrefix, router);
+} else {
+  app.use(router);
+}
+
 // Start server
 app.listen(PORT, () => {
+  const base = servicePrefix || '';
   console.log(`🌿 SwiftQuote. API server running on port ${PORT}`);
   console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+  console.log(
+    `🔗 Health check: http://localhost:${PORT}${base}/api/health`
+  );
 });
 
 module.exports = app;

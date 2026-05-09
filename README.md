@@ -28,12 +28,15 @@ cd frontend && USE_EXPRESS_BACKEND=true npm run dev
 
 Maps key can stay in `backend/.env` when using the proxy; Next route handlers are bypassed for `/api/*`.
 
-## Deploy on Vercel
+## Deploy on Vercel (Next.js only)
 
-1. Import the repo; set **Root Directory** to `frontend`.
+This repo is set up for a **single Vercel project** with **Root Directory = `frontend`**. No root `vercel.json` is required.
+
+1. Import the GitHub repo → **Root Directory:** `frontend`.
 2. **Environment variables:** `GOOGLE_MAPS_API_KEY` (required). Optionally `POSTGRES_URL`, `STATS_API_SECRET` (for `GET /api/stats`).
-3. Add **Vercel Postgres** (or Neon) and run `frontend/db/init.sql` in the SQL editor.
-4. In the Vercel project → **Analytics**, enable **Web Analytics** for visitors and page views.
-5. Address searches are stored in `address_searches` when `POSTGRES_URL` is set. Fetch summaries with:
-
+3. **Neon** (or another Postgres): run `frontend/db/init.sql` once in the SQL editor.
+4. **Analytics** → enable **Web Analytics** for visitor metrics.
+5. Address searches are stored when `POSTGRES_URL` is set. Example:  
    `curl -H "x-stats-secret: YOUR_SECRET" https://your-app.vercel.app/api/stats`
+
+The Express app in `backend/` is for **local** use or other hosts only, not part of this Vercel deploy. To also run Express on Vercel in the same repo, you’d use [Vercel Services](https://vercel.com/docs/services) (`experimentalServices` in a root `vercel.json`) and set `EXPRESS_ROUTE_PREFIX` to match your backend `routePrefix`.
