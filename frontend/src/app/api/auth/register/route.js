@@ -58,6 +58,13 @@ export async function POST(request) {
       }, { status: 500 });
     }
 
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({
+        error: 'Authentication not configured',
+        message: 'JWT_SECRET environment variable is required'
+      }, { status: 500 });
+    }
+
     // Check if user already exists
     const existingUserResult = await sql`
       SELECT id FROM users WHERE email = ${email} LIMIT 1
@@ -118,7 +125,7 @@ export async function POST(request) {
     return response;
 
   } catch (error) {
-    console.error('register-error:', error);
+    console.error('register-error:', error?.message || error, error?.code);
 
     // Handle database constraint violations
     if (error.code === '23505') { // PostgreSQL unique constraint violation
@@ -128,9 +135,20 @@ export async function POST(request) {
       }, { status: 409 });
     }
 
+    // Undefined table / relation (schema not applied)
+    if (error.code === '42P01') {
+      return NextResponse.json({
+        error: 'Database schema missing',
+        message: 'Run the CRM schema on this database (see frontend/db/crm-schema.sql or npm run db:crm).'
+      }, { status: 500 });
+    }
+
     return NextResponse.json({
       error: 'Registration failed',
-      message: 'An internal server error occurred'
+      message:
+        process.env.NODE_ENV === 'development'
+          ? (error?.message || 'An internal server error occurred')
+          : 'An internal server error occurred'
     }, { status: 500 });
   }
 }

@@ -88,7 +88,8 @@ const useCRMStore = create((set, get) => ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        const detail = [data.error, data.message].filter(Boolean).join(': ');
+        throw new Error(detail || 'Login failed');
       }
 
       set({
@@ -129,7 +130,8 @@ const useCRMStore = create((set, get) => ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        const detail = [data.error, data.message].filter(Boolean).join(': ');
+        throw new Error(detail || 'Registration failed');
       }
 
       set({

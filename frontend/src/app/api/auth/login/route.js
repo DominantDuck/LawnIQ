@@ -40,6 +40,13 @@ export async function POST(request) {
       }, { status: 500 });
     }
 
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({
+        error: 'Authentication not configured',
+        message: 'JWT_SECRET environment variable is required'
+      }, { status: 500 });
+    }
+
     // Find user by email
     const userResult = await sql`
       SELECT id, email, password_hash, first_name, last_name, created_at
