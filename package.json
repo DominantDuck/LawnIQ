@@ -1,0 +1,9 @@
+{
+  "name": "lawniq",
+  "private": true,
+  "description": "Monorepo root. Prefer Vercel Project Root Directory = frontend. This package.json supports deploys from the repo root.",
+  "scripts": {
+    "postinstall": "npm install --prefix frontend",
+    "build": "npm run build --prefix frontend"
+  }
+}
