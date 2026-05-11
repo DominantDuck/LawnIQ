@@ -80,12 +80,39 @@ const useAppStore = create((set, get) => ({
     };
   }),
 
-  clearAllPolygons: () => set({
-    polygons: [],
-    totalArea: 0,
-    selectedPolygon: null,
-    drawingMode: false
-  }),
+  clearAllPolygons: () => {
+    const { polygons } = get();
+    for (const p of polygons) {
+      if (p.googleMapsPolygon && typeof p.googleMapsPolygon.setMap === 'function') {
+        p.googleMapsPolygon.setMap(null);
+      }
+    }
+    set({
+      polygons: [],
+      totalArea: 0,
+      selectedPolygon: null,
+      drawingMode: false
+    });
+  },
+
+  /**
+   * Center map + replace polygons (e.g. viewing a contact's saved measurements).
+   * Polygons should omit googleMapsPolygon — MapView will attach map overlays.
+   */
+  setMapFromContactView: ({ address, location, polygons }) => {
+    const safe = (polygons || []).filter(
+      (p) => Array.isArray(p.coordinates) && p.coordinates.length >= 3
+    );
+    const totalArea = safe.reduce((s, p) => s + (Number(p.area) || 0), 0);
+    set({
+      currentLocation: location,
+      currentAddress: address || '',
+      polygons: safe,
+      totalArea,
+      selectedPolygon: null,
+      drawingMode: false
+    });
+  },
 
   setSelectedPolygon: (polygon) => set({ selectedPolygon: polygon }),
 

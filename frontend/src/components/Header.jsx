@@ -1,6 +1,7 @@
-import { Search, Menu, MapPin } from 'lucide-react';
+import { Search, Menu, MapPin, LogIn, User, LogOut, Users } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import useAppStore from '../store/useAppStore';
+import useCRMStore from '../store/useCRMStore';
 import './Header.css';
 
 function logAddressSearch(formattedAddress, lat, lng) {
@@ -11,7 +12,7 @@ function logAddressSearch(formattedAddress, lat, lng) {
   }).catch(() => {});
 }
 
-function Header() {
+function Header({ onOpenCRM }) {
   const [addressInput, setAddressInput] = useState('');
   const [predictions, setPredictions] = useState([]);
   const [showPredictions, setShowPredictions] = useState(false);
@@ -32,6 +33,13 @@ function Header() {
     setSearchLoading,
     addNotification
   } = useAppStore();
+
+  const {
+    user,
+    isAuthenticated,
+    logout,
+    setShowLoginModal
+  } = useCRMStore();
 
   // Initialize Google Places services
   useEffect(() => {
@@ -320,6 +328,48 @@ function Header() {
           </span>
           <span className="unit">sq ft</span>
         </div>
+
+        {/* CRM Access - only show when authenticated */}
+        {isAuthenticated && (
+          <button
+            type="button"
+            className="button crm-button"
+            onClick={() => onOpenCRM()}
+            title="Open CRM"
+          >
+            <Users size={16} />
+            CRM
+          </button>
+        )}
+
+        {/* User Authentication */}
+        {isAuthenticated ? (
+          <div className="user-menu">
+            <div className="user-info">
+              <User size={16} />
+              <span className="user-name">
+                {user?.first_name} {user?.last_name}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="button user-action"
+              onClick={logout}
+              title="Sign out"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="button primary login-button"
+            onClick={() => setShowLoginModal(true)}
+          >
+            <LogIn size={16} />
+            Sign In
+          </button>
+        )}
 
       </div>
     </header>

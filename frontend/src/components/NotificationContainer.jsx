@@ -173,11 +173,11 @@ function NotificationContainer() {
           position: fixed;
           top: 1rem;
           right: 1rem;
-          z-index: 1100;
+          z-index: 1250;
           pointer-events: none;
         }
 
-        .notification-container :global(.notification) {
+        .notification-container .notification {
           pointer-events: all;
         }
 
@@ -188,7 +188,7 @@ function NotificationContainer() {
             left: 0.5rem;
           }
 
-          .notification-container :global(.notification) {
+          .notification-container .notification {
             min-width: auto;
             max-width: none;
           }

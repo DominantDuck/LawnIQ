@@ -6,11 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:crm": "node scripts/run-crm-schema.cjs"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",
     "@vercel/postgres": "^0.10.0",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.14.0",
     "next": "^15.3.3",
     "react": "^19.2.5",
@@ -19,6 +22,7 @@
   },
   "devDependencies": {
     "eslint": "^9.18.0",
-    "eslint-config-next": "^15.3.3"
+    "eslint-config-next": "^15.3.3",
+    "pg": "^8.13.1"
   }
 }

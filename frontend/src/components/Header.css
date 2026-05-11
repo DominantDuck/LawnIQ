@@ -184,4 +184,113 @@
   .search-button span {
     display: none;
   }
+
+  .user-menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+  }
+
+  .user-info {
+    font-size: 0.75rem;
+    min-width: unset;
+  }
+
+  .user-name {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .login-button span {
+    display: none;
+  }
+}
+
+/* User Authentication Styles */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 8px;
+  color: var(--green-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.user-name {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.user-action {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+}
+
+.user-action:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+  background: var(--green-50);
+}
+
+.login-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* CRM Button Styles */
+.crm-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, var(--green-500), var(--green-700));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms ease;
+  box-shadow: 0 2px 8px rgba(74, 138, 24, 0.2);
+  flex-shrink: 0;
+}
+
+.crm-button:hover {
+  background: linear-gradient(135deg, var(--green-700), var(--green-700));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 138, 24, 0.3);
+}
+
+.crm-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .crm-button span {
+    display: none;
+  }
+
+  .crm-button {
+    padding: 0.5rem;
+  }
 }
