@@ -30,14 +30,16 @@ Maps key can stay in `backend/.env` when using the proxy; Next route handlers ar
 
 ## Deploy on Vercel (Next.js only)
 
-**Two valid setups:**
+**Root Directory = `frontend` (recommended)**
 
-1. **Framework: Next.js** — set **Root Directory** to `frontend`. You do not need root `vercel.json` for that (you can delete `experimentalServices` if you switch framework).
-2. **Framework: Services** — keep the repo root as the project root. Root `vercel.json` must declare **`experimentalServices`** with at least one service; this repo includes the **`frontend`** Next.js app at `/` (see `vercel.json`).
+- **Framework: Next.js** — simplest: no `experimentalServices` needed. You can delete `frontend/vercel.json` if you switch off Services.
+- **Framework: Services** — this repo ships **`frontend/vercel.json`** declaring one Next.js service with `"entrypoint": "."` (the app **is** the Root Directory). Do **not** use a repo-root `vercel.json` with `"entrypoint": "frontend"` in this layout; that path is wrong once the project root is already `frontend/`.
 
-A root `package.json` also supports **install + build from the repository root** when not using the Services detector for installs.
+**Include files outside the root directory in the Build Step** — leave **off** unless a build fails because something outside `frontend/` is required (this app does not import parent folders).
 
-1. Import the GitHub repo → either **Root Directory:** `frontend` (Next.js framework), or **Services** + root `vercel.json` as committed.
+**Root Directory empty (repo root) + Services** — use a **repository root** `vercel.json` with `"entrypoint": "frontend"` (restore from git history or duplicate the `experimentalServices` block with paths relative to repo root). A root `package.json` can still help install/build from the monorepo root.
+
+1. Import the GitHub repo → **Root Directory:** `frontend` (typical). Env vars and build read from `frontend/`.
 2. **Environment variables:** `GOOGLE_MAPS_API_KEY` (required). Optionally `POSTGRES_URL`, `STATS_API_SECRET` (for `GET /api/stats`).
 3. **Neon** (or another Postgres): run `frontend/db/init.sql` once in the SQL editor.
 4. **Analytics** → enable **Web Analytics** for visitor metrics.
