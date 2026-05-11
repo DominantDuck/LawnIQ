@@ -30,9 +30,14 @@ Maps key can stay in `backend/.env` when using the proxy; Next route handlers ar
 
 ## Deploy on Vercel (Next.js only)
 
-This repo is set up for a **single Vercel project** with **Root Directory = `frontend`** (recommended). A root `package.json` also supports **deploying from the repository root** (install + build run in `frontend/`).
+**Two valid setups:**
 
-1. Import the GitHub repo → **Root Directory:** `frontend` (or leave root and rely on the root `postinstall` / `build` scripts).
+1. **Framework: Next.js** — set **Root Directory** to `frontend`. You do not need root `vercel.json` for that (you can delete `experimentalServices` if you switch framework).
+2. **Framework: Services** — keep the repo root as the project root. Root `vercel.json` must declare **`experimentalServices`** with at least one service; this repo includes the **`frontend`** Next.js app at `/` (see `vercel.json`).
+
+A root `package.json` also supports **install + build from the repository root** when not using the Services detector for installs.
+
+1. Import the GitHub repo → either **Root Directory:** `frontend` (Next.js framework), or **Services** + root `vercel.json` as committed.
 2. **Environment variables:** `GOOGLE_MAPS_API_KEY` (required). Optionally `POSTGRES_URL`, `STATS_API_SECRET` (for `GET /api/stats`).
 3. **Neon** (or another Postgres): run `frontend/db/init.sql` once in the SQL editor.
 4. **Analytics** → enable **Web Analytics** for visitor metrics.
